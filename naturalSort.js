@@ -3,13 +3,18 @@
  * Author: Jim Palmer (based on chunking idea from Dave Koelle)
  */
 /*jshint unused:false */
-module.exports = function naturalSort (a, b) {
+
+var normal = function(s) { return '' + s; },
+	toLowerCase = function(s) { return ('' + s).toLowerCase(); },
+	insensitive = false,
+	i = normal;
+
+function naturalSort (a, b) {
 	"use strict";
 	var re = /(^([+\-]?(?:0|[1-9]\d*)(?:\.\d*)?(?:[eE][+\-]?\d+)?)?$|^0x[0-9a-f]+$|\d+)/gi,
 		dre = /(^([\w ]+,?[\w ]+)?[\w ]+,?[\w ]+\d+:\d+(:\d+)?[\w ]?|^\d{1,4}[\/\-]\d{1,4}[\/\-]\d{1,4}|^\w+, \w+ \d+, \d{4})/,
 		hre = /^0x[0-9a-f]+$/i,
 		ore = /^0/,
-		i = function(s) { return naturalSort.insensitive && ('' + s).toLowerCase() || '' + s; },
 		// convert all to strings strip whitespace
 		x = i(a).trim() || '',
 		y = i(b).trim() || '',
@@ -42,3 +47,16 @@ module.exports = function naturalSort (a, b) {
 	}
 	return 0;
 };
+
+Object.defineProperty(naturalSort, 'insensitive', {
+	set: function(v) {
+		if(insensitive === v) return;
+		insensitive = v;
+		i = insensitive ? toLowerCase : normal;
+	},
+	get: function() {
+		return insensitive;
+	}
+});
+
+module.exports = naturalSort;
